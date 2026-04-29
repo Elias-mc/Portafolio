@@ -2,7 +2,8 @@
 
 <div align="center">
 
-![Portfolio Preview](./assets/preview.png)
+<img width="1382" height="736" alt="image" src="https://github.com/user-attachments/assets/03d6ea66-31c2-4765-8934-b474a08ccfd5" />
+
 
 **Portafolio web personal construido con React + Vite + Tailwind CSS**
 
