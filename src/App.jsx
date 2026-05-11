@@ -343,7 +343,7 @@ function App() {
           {rain && <CodeRain />}
 
           {/* TEXTO */}
-          <div className="relative z-10 max-w-xl flex flex-col lg:h-130 h-95 sm:h-110 animate-fadeInUp">
+          <div className="relative z-10 max-w-xl flex flex-col lg:h-130 h-110 animate-fadeInUp">
             <p className="text-md pb-4 text-taupe-600 font-mono animate-fadeIn delay-100">
               Hola, soy
             </p>
