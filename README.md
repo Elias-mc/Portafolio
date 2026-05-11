@@ -4,8 +4,7 @@
 
 <img width="1382" height="736" alt="image" src="https://github.com/user-attachments/assets/03d6ea66-31c2-4765-8934-b474a08ccfd5" />
 
-
-**Portafolio web personal construido con React + Vite + Tailwind CSS**
+**Portafolio web personal construido con React + Vite + Tailwind CSsS**
 
 [![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://react.dev)
 [![Vite](https://img.shields.io/badge/Vite-5-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev)
@@ -55,13 +54,13 @@ Portafolio personal diseñado para mostrar mis proyectos, habilidades y experien
 
 ## 🛠 Tech Stack
 
-| Tecnología | Uso |
-|-----------|-----|
-| **React 18** | UI y manejo de estado |
-| **Vite** | Build tool y dev server |
-| **Tailwind CSS 3** | Estilos y diseño responsive |
-| **EmailJS** | Envío de emails desde el frontend sin backend |
-| **CSS Animations** | Animaciones personalizadas con `@keyframes` |
+| Tecnología         | Uso                                           |
+| ------------------ | --------------------------------------------- |
+| **React 18**       | UI y manejo de estado                         |
+| **Vite**           | Build tool y dev server                       |
+| **Tailwind CSS 3** | Estilos y diseño responsive                   |
+| **EmailJS**        | Envío de emails desde el frontend sin backend |
+| **CSS Animations** | Animaciones personalizadas con `@keyframes`   |
 
 ---
 
@@ -118,11 +117,11 @@ El formulario de contacto usa **EmailJS**. Para configurarlo, reemplazá las sig
 
 ```js
 emailjs.sendForm(
-  "TU_SERVICE_ID",    // ID del servicio en EmailJS
-  "TU_TEMPLATE_ID",   // ID del template
+  "TU_SERVICE_ID", // ID del servicio en EmailJS
+  "TU_TEMPLATE_ID", // ID del template
   form.current,
-  "TU_PUBLIC_KEY"     // Clave pública de tu cuenta
-)
+  "TU_PUBLIC_KEY", // Clave pública de tu cuenta
+);
 ```
 
 Podés obtener estas claves en [emailjs.com](https://www.emailjs.com) de forma gratuita.
