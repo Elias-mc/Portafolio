@@ -1,9 +1,17 @@
 import { useState, useEffect } from "react";
 import CodeRain from "./CodeRain";
 import Contacto from "./Contacto";
-
 import { useInView } from "./useInView";
+
 function App() {
+  const [showNav, setShowNav] = useState(true);
+  const [lastScroll, setLastScroll] = useState(0);
+  const [open, setOpen] = useState(false);
+  const [homeRef, homeVisible] = useState(false);
+  const [aboutRef, aboutVisible] = useInView({ threshold: 0.2 });
+  const [skillsRef, skillsVisible] = useInView({ threshold: 0.2 });
+  const [aboutAnimated, setAboutAnimated] = useState(false);
+
   const [rain, setRain] = useState(() => {
     const savedRain = localStorage.getItem("rain");
     // Si hay un valor, lo parseamos (JSON.parse), si no, devolvemos true
@@ -14,12 +22,6 @@ function App() {
   useEffect(() => {
     localStorage.setItem("rain", JSON.stringify(rain));
   }, [rain]);
-  const [open, setOpen] = useState(false);
-
-  const [aboutRef, aboutVisible] = useInView({ threshold: 0.2 });
-  const [skillsRef, skillsVisible] = useInView({ threshold: 0.2 });
-
-  const [aboutAnimated, setAboutAnimated] = useState(false);
 
   if (aboutVisible && !aboutAnimated) {
     setAboutAnimated(true);
@@ -114,16 +116,51 @@ function App() {
     },
   ];
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScroll = window.scrollY;
+
+      // SI BAJA
+      if (currentScroll > lastScroll && currentScroll > 100) {
+        setShowNav(false);
+      }
+      // SI SUBE
+      else {
+        setShowNav(true);
+      }
+
+      setLastScroll(currentScroll);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [lastScroll]);
+
   return (
     <>
       <nav
-        className="flex flex-col fixed bg-zinc-900 h-screen px-4 py-6 z-50 gap-38
-  animate-[navIn_0.6s_ease-out]"
-      >
-        <div className="flex flex-col gap-10">
-          <button className="text-zinc-400 font-serif  text-4xl ">EM</button>
+        className={`
+        flex flex-row lg:flex-col fixed
+       bg-zinc-900
+        w-screen lg:w-auto lg:h-screen
+        px-4 py-3 md:py-6
+        z-50 lg:gap-38
+        transition-transform duration-500
 
-          <div className="flex flex-col gap-5 items-center">
+    ${showNav ? "translate-y-0" : "-translate-y-full lg:translate-y-0"}
+
+    animate-[navIn_0.6s_ease-out]
+  `}
+      >
+        <div className="flex flex-row justify-around lg:flex-col gap-10">
+          <button className="text-zinc-400 font-serif text-2xl md:text-4xl ">
+            EM
+          </button>
+
+          <div className="lg:flex hidden flex-row lg:flex-col gap-5 items-center">
             <a
               href="#Home"
               className="flex flex-col items-center text-zinc-400 hover:text-white group"
@@ -211,7 +248,7 @@ function App() {
           </div>
         </div>
 
-        <div className=" flex flex-col gap-3">
+        <div className="hidden md:flex  flex-row lg:flex-col gap-3">
           <hr className="border-t border-zinc-500 " />
           <button
             onClick={() => setRain((prev) => !prev)}
@@ -271,12 +308,31 @@ function App() {
             </div>
           </a>
         </div>
+
+        <div className="flex md:hidden ml-auto ">
+          <button
+            className="text-zinc-400  hover:text-zinc-50 hover:scale-120 cursor-pointer  "
+            onClick={() => homeVisible(true)}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-6 "
+              fill="currentColor"
+              viewBox="0 0 16 16"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"
+              />
+            </svg>
+          </button>
+        </div>
       </nav>
 
-      <main className="transition-all ml-25 ">
+      <main className="transition-all mx-auto lg:ml-25 ">
         <header
           id="Home"
-          className="relative flex bg-orange-100 w-full min-h-screen mx-auto pt-20 px-6 md:px-10 items-center justify-around overflow-hidden"
+          className=" relative flex flex-col  lg:flex-row bg-orange-100 w-full  lg:min-h-screen mx-auto pt-20 px-6 md:px-10 items-center justify-around overflow-hidden"
         >
           {/* GRID FONDO */}
           <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.08)_1px,transparent_1px)] bg-size-[50px_50px] z-0" />
@@ -287,12 +343,12 @@ function App() {
           {rain && <CodeRain />}
 
           {/* TEXTO */}
-          <div className="relative z-10 max-w-xl flex flex-col h-130 animate-fadeInUp">
+          <div className="relative z-10 max-w-xl flex flex-col lg:h-130 h-95 sm:h-110 animate-fadeInUp">
             <p className="text-md pb-4 text-taupe-600 font-mono animate-fadeIn delay-100">
               Hola, soy
             </p>
 
-            <h1 className="text-6xl md:text-8xl font-bold font-serif pb-4 leading-tight flex items-center">
+            <h1 className="text-6xl justify-center md:justify-start  md:text-8xl font-bold font-serif pb-4 leading-tight flex items-center">
               <span className="inline-block animate-slideUp delay-200">
                 Elias
               </span>
@@ -305,24 +361,25 @@ function App() {
               <span className="ml-2 w-0.5 h-[0.9em] bg-taupe-500 animate-caret"></span>
             </h1>
 
-            <p className="text-taupe-500 uppercase text-sm md:text-base pb-4 tracking-[0.3em] md:tracking-[0.4em] font-bold font-mono animate-fadeIn delay-300">
+            <p className="text-taupe-500  text-center lg:text-start uppercase text-sm md:text-base pb-4 tracking-[0.3em] md:tracking-[0.4em] font-bold font-mono animate-fadeIn delay-300">
               Desarrollador de aplicaciones <br /> y creador de experiencias
             </p>
 
-            <p className="text-md pb-6 font-mono animate-fadeIn delay-500">
+            <p className="text-sm pb-6 font-mono animate-fadeIn text-center lg:text-start delay-500">
               Me especializo en construir aplicaciones móviles
-              <br />
-              interactivas, juegos y experiencias web modernas <br />
+              <br className="hidden md:block" />
+              interactivas, juegos y experiencias web modernas{" "}
+              <br className="hidden md:block" />
               con foco en el diseño y funcionalidad.
             </p>
 
             {/* BOTONES */}
-            <div className="flex flex-row sm:flex-row gap-4">
+            <div className="flex flex-row flex-wrap justify-center sm:flex-row gap-2 md:gap-4">
               <a
                 href="#"
-                className="group flex items-center gap-4 px-6 py-4 rounded-2xl text-zinc-200 font-mono 
-        bg-linear-to-r from-zinc-900 via-zinc-800 to-zinc-700
-        hover:scale-105 hover:shadow-xl transition-all duration-300"
+                className="group flex items-center gap-2 sm:gap-4 text-sm px-5 py-2 sm:px-6 md:py-4 rounded-2xl text-zinc-200 font-mono 
+                bg-linear-to-r from-zinc-900 via-zinc-800 to-zinc-700
+                hover:scale-105 hover:shadow-xl transition-all duration-300"
               >
                 Ver mis proyectos
                 <svg
@@ -331,7 +388,7 @@ function App() {
                   height="16"
                   fill="currentColor"
                   viewBox="0 0 16 16"
-                  className="transition group-hover:translate-x-2"
+                  className="transition group-hover:translate-x-1 md:group-hover:translate-x-2"
                 >
                   <path d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8" />
                 </svg>
@@ -340,7 +397,7 @@ function App() {
               <a
                 target="_blank"
                 href="./pdf/Elias-Macay_CV.pdf"
-                className="group flex items-center gap-3 font-mono px-4 py-4"
+                className="group flex items-center gap-3 font-mono text-sm md:text-md m-2 sm:m-0 px-4 py-4"
               >
                 Descargar CV
                 <svg
@@ -358,22 +415,18 @@ function App() {
             </div>
           </div>
 
-          <div className="z-10 animate-fadeInRight hidden md:block">
-            <div className="group relative bg-white/70 rounded-4xl w-80 h-105 flex justify-center items-center overflow-hidden shadow-lg animate-float">
+          <div className="z-10 animate-fadeInRight md:block">
+            <div className="group relative bg-white/70 rounded-4xl w-70 sm:w-80 h-90 sm:h-105 flex justify-center items-center overflow-hidden shadow-lg animate-float">
               <div className="w-11/12 h-11/12 rounded-4xl overflow-hidden">
                 <img
                   src="/perfil.jpg"
                   alt="perfil"
-                  className="w-full h-full object-cover rounded-4xl 
-          transition-transform duration-700 group-hover:scale-110"
+                  className="w-full h-full object-cover rounded-4xl transition-transform duration-700 group-hover:scale-110"
                 />
               </div>
             </div>
 
-            <div
-              className="bg-white px-6 py-6 relative -top-20 left-24 rounded-4xl shadow-md w-60 
-    animate-fadeIn delay-500 hover:-translate-y-2 transition-all duration-300"
-            >
+            <div className="bg-white px-6 py-6 relative -top-10  sm:-top-20 sm:left-24 rounded-2xl sm:rounded-4xl shadow-md sm:w-60 animate-fadeIn delay-500 hover:-translate-y-2 transition-all duration-300">
               <p className="text-sm text-zinc-800 leading-relaxed mb-6">
                 Disponible para <br />
                 proyectos freelance
@@ -405,8 +458,8 @@ function App() {
         <section
           ref={aboutRef}
           id="About-me"
-          className={`relative flex flex-col md:flex-row bg-orange-200 mx-auto items-center py-20 px-6 md:px-12 justify-around gap-12 overflow-hidden
-              transition-all duration-1000 ease-out
+          className={`  relative flex flex-col lg:flex-row bg-orange-200 mx-auto items-center py-10 md:py20 px-6 md:px-12 justify-around gap-6 md:gap-12 overflow-hidden
+              transition-all duration-1000 ease-out @media @max-sm:justify-center 
               ${aboutAnimated ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
         >
           {/* FONDO DECORATIVO */}
@@ -414,17 +467,17 @@ function App() {
 
           {/* TEXTO */}
           <div
-            className={`relative z-10 px-2 py-3 max-w-xl transition-all duration-700 ease-out ${
+            className={`items-center  flex-col lg:min-w-xl  lg:items-start  flex relative z-10 px-2 py-3 max-w-xl transition-all duration-700   ease-out ${
               aboutAnimated
                 ? "opacity-100 translate-x-0"
                 : "opacity-0 -translate-x-10"
             }`}
           >
-            <p className="font-mono text-sm mb-5 font-bold uppercase text-amber-600 tracking-widest animate-[fadeUp_0.6s_ease-out]">
+            <p className="font-mono  text-xs  mb-2 lg:mb-5 font-bold uppercase text-amber-600 tracking-widest animate-[fadeUp_0.6s_ease-out]">
               Sobre mí
             </p>
 
-            <h2 className="text-3xl md:text-5xl font-serif mb-6 leading-tight animate-[fadeUp_0.8s_ease-out]">
+            <h2 className="text-3xl lg:text-5xl text-center lg:text-start  md:text-4xl font-serif mb-3 md:mb-6 leading-tight animate-[fadeUp_0.8s_ease-out]">
               Apasionado por crear
               <br />
               soluciones que conectan
@@ -432,7 +485,7 @@ function App() {
               ideas con personas.
             </h2>
 
-            <p className="font-mono text-md mb-6 text-zinc-700 animate-[fadeUp_1s_ease-out]">
+            <p className="font-mono md:text-base text-sm text-center lg:text-start  mb-6 text-zinc-700 animate-[fadeUp_1s_ease-out]">
               Combino lógica y creatividad para transformar
               <br className="hidden sm:block" />
               conceptos en productos digitales funcionales,
@@ -440,13 +493,13 @@ function App() {
               atractivos y útiles.
             </p>
 
-            <h3 className="font-firma text-5xl text-amber-400 -rotate-3 animate-float">
+            <h3 className="font-firma text-4xl md:text-5xl text-amber-400 -rotate-3 animate-float">
               Elias
             </h3>
           </div>
 
           {/* CARDS */}
-          <div className="relative z-10 flex flex-col sm:flex-row gap-6">
+          <div className="relative justify-center flex-wrap z-10 flex flex-col sm:flex-row gap-6">
             {/* CARD 1 */}
             <div
               className={`group bg-white rounded-3xl flex flex-col px-6 py-8 w-64 shadow-md
@@ -511,21 +564,21 @@ function App() {
 
         <section
           ref={skillsRef}
-          className={`bg-orange-100 py-16 overflow-hidden ${aboutAnimated ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+          className={`bg-orange-100 md:py-16 py-8 overflow-hidden ${aboutAnimated ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
           id="Skills"
         >
-          <div className="px-5 w-full">
+          <div className="px-5   w-full">
             <div
-              className={`flex justify-between w-full mb-10 transition-all duration-700 ${
+              className={`flex justify-center flex-col md:flex-row items-center md:justify-between px-5 w-full mb-10 transition-all duration-700 ${
                 aboutAnimated
                   ? "opacity-100 translate-y-0"
                   : "opacity-0 translate-y-5"
               }`}
             >
-              <h3 className="font-mono uppercase text-lg tracking-widest">
+              <h3 className="font-mono   uppercase text-lg tracking-widest">
                 Habilidades
               </h3>
-              <p className="font-mono text-md text-zinc-600">
+              <p className="font-mono  text-md text-zinc-600">
                 Siempre aprendiendo.
               </p>
             </div>
@@ -568,13 +621,13 @@ function App() {
           className="flex bg-zinc-900 rounded-t-4xl  mx-auto pt-10 flex-col px-10 justify-center-safe"
           id="mail"
         >
-          <div className="flex flex-wrap flex-row justify-around gap-15 items-center mb-2">
-            <div className="flex flex-raw items-center gap-10">
-              <div className="flex flex-col gap-6 max-w-80">
-                <h2 className="text-3xl font-bold font-serif text-amber-100">
+          <div className="flex flex-wrap flex-row justify-around gap-5 md:gap-10 items-center mb-2">
+            <div className="flex flex-row flex-wrap justify-center gap-5  md:gap-10">
+              <div className="flex flex-col text-center items-center md:text-start md:items-start gap-3 md:gap-6 max-w-80">
+                <h2 className="text-2xl md:text-3xl font-bold font-serif text-amber-100">
                   ¿Tieneas un proyecto en mente?
                 </h2>
-                <p className="text-md text-zinc-200 font-mono mb-3">
+                <p className="md:text-md text-sm text-zinc-200 font-mono mb-3">
                   Estoy disponible para colaboraciones y proyectos y proyectos
                   freelance.
                 </p>
@@ -599,7 +652,7 @@ function App() {
                 </button>
               </div>
 
-              <div className="flex border-l border-zinc-300 pl-10 justify-around py-7 gap-10 flex-col ">
+              <div className="flex md:border-l sm:border-zinc-300 items-center md:items-start md:pl-10 justify-around ite py-7 gap-5 md:gap-10 flex-col ">
                 <a
                   href="#"
                   className="text-center flex gap-2 items-center text-amber-50"
@@ -642,7 +695,7 @@ function App() {
             </div>
           </div>
           <div className="border-t border-zinc-300 mx-10 justify-center items-center py-2 flex ">
-            <p className="font-mono text-zinc-300">
+            <p className="font-mono text-sm md:text-base cent text-center text-zinc-300">
               2026 Elias.dev -- Todos los derechos reservados.
             </p>
           </div>
@@ -832,6 +885,92 @@ function App() {
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+      )}
+
+      {homeRef && (
+        <section className=" transition-all fixed bg-zinc-800 opacity-99 flex-col gap-9 inset-0 z-61 mx-auto flex items-center justify-center p-4 ">
+          <div className="relative -right-50 -top-50">
+            <button
+              className=" text-zinc-100 w-6 cursor-pointer"
+              onClick={() => homeVisible(false)}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                className="w-full"
+                viewBox="0 0 16 16"
+              >
+                <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="flex flex-col items-center gap-5">
+            <a
+              href="#Home"
+              onClick={() => homeVisible(false)}
+              className="text-white text-2xl uppercase "
+            >
+              Inicio
+            </a>
+
+            <a
+              href="#About-me"
+              onClick={() => homeVisible(false)}
+              className="text-white text-2xl uppercase "
+            >
+              Sobre mi
+            </a>
+
+            <a
+              href="#Skills"
+              onClick={() => homeVisible(false)}
+              className="text-white text-2xl uppercase "
+            >
+              Habilidades
+            </a>
+
+            <a
+              href="#mail"
+              onClick={() => homeVisible(false)}
+              className="text-white text-2xl uppercase "
+            >
+              Contacto
+            </a>
+          </div>
+
+          <div className=" flex flex-row gap-10 ">
+            <a
+              target="_blank"
+              href="https://github.com/Elias-mc"
+              className="flex flex-col items-center text-zinc-800 hover:text-zinc-50 group bg-zinc-200 hover:bg-zinc-400  p-3 rounded-lg"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-7"
+                fill="currentColor"
+                viewBox="0 0 16 16"
+              >
+                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8" />
+              </svg>
+            </a>
+
+            <a
+              target="_blank"
+              href="https://www.linkedin.com/in/elias-macay-b02753386/"
+              className="flex flex-col items-center text-zinc-800 hover:text-zinc-50 group bg-zinc-200 hover:bg-zinc-400  p-3 rounded-lg"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-7"
+                fill="currentColor"
+                viewBox="0 0 16 16"
+              >
+                <path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854zm4.943 12.248V6.169H2.542v7.225zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248S2.4 3.226 2.4 3.934c0 .694.521 1.248 1.327 1.248zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016l.016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225z" />
+              </svg>
+            </a>
           </div>
         </section>
       )}
